@@ -11,9 +11,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from churn_data import CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 from models import baseline_models, score_probabilities
+from sklearn.model_selection import ParameterGrid
+from tune import PARAMETER_GRIDS
 
 
 class BaselineChecks(unittest.TestCase):
+    def test_search_grids_include_baseline_first(self):
+        expected_sizes = {"KNN": 16, "Logistic regression": 5, "Random forest": 18}
+        for name, grid in PARAMETER_GRIDS.items():
+            with self.subTest(model=name):
+                candidates = list(ParameterGrid(grid))
+                self.assertEqual(len(candidates), expected_sizes[name])
+                parameters = baseline_models()[name].get_params()
+                for parameter, value in candidates[0].items():
+                    self.assertEqual(value, parameters[parameter])
+
     def test_threshold_and_metrics_against_hand_calculation(self):
         # A score of exactly 0.50 must count as churn in every model.
         scores = score_probabilities([0, 0, 1, 1], [0.10, 0.50, 0.40, 0.90])
