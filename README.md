@@ -28,9 +28,13 @@ Download version 1 of BlastChar's Telco Customer Churn dataset and extract `WA_F
 .\.venv\Scripts\python.exe src/eda.py
 .\.venv\Scripts\python.exe -W error -m unittest discover -s tests -v
 .\.venv\Scripts\python.exe src/baseline.py
+.\.venv\Scripts\python.exe src/tune.py
+.\.venv\Scripts\python.exe src/evaluate.py
 ```
 
 The exploratory analysis writes `results/training-eda.png`. The baseline comparison writes `results/baseline.json`, including settings, fold scores and software versions. Both scripts resolve paths from their source location.
+
+The tuning script searches 39 parameter combinations on the development folds and writes `results/tuning.json`. Run it before evaluation. The evaluation script fits the fixed baseline and selected settings on the development sample and writes `results/test.json` and `results/test-evaluation.png`. Customer-level test predictions are saved locally in `data/test_predictions.npz` for verification and the subgroup audit.
 
 ## Experimental method
 
@@ -38,4 +42,25 @@ The pipeline maps churn to 1 and retention to 0. It reserves a stratified 20% te
 
 Customer ID, gender and senior-citizen status are excluded from fitting. The demographic fields are retained locally for the subgroup audit. Eleven blank total-charge values occur at zero tenure. Their cumulative charges are estimated as zero under a fixed preparation rule.
 
-Average precision is the primary comparison metric. Precision, recall, F1 and accuracy use a churn probability threshold of 0.50. Logistic regression has the highest baseline validation average precision. Hyperparameter tuning and held-out evaluation form the next experimental stage.
+Average precision is the primary comparison metric. Precision, recall, F1 and accuracy use a churn probability threshold of 0.50. Hyperparameters are selected using the same development folds as the baseline experiment. The baseline appears first in each grid so it is retained on an exact tie. A random forest with 300 trees and minimum leaf size 15 was nominated using development average precision before test evaluation. Logistic regression retained C = 1. KNN selected 31 uniformly weighted neighbours and Euclidean distance.
+
+## Held-out results
+
+The test sample contains 1,409 customers, including 374 churners. These results compare the six fixed settings.
+
+| Model | Setting | Average precision | ROC AUC | Precision | Recall | F1 | Accuracy |
+|---|---|---:|---:|---:|---:|---:|---:|
+| KNN | Baseline | 0.506 | 0.778 | 0.542 | 0.500 | 0.520 | 0.755 |
+| KNN | Tuned | 0.606 | 0.829 | 0.593 | 0.564 | 0.578 | 0.781 |
+| Logistic regression | Baseline | 0.632 | 0.841 | 0.650 | 0.551 | 0.596 | 0.802 |
+| Logistic regression | Tuned | 0.632 | 0.841 | 0.650 | 0.551 | 0.596 | 0.802 |
+| Random forest | Baseline | 0.609 | 0.818 | 0.614 | 0.511 | 0.558 | 0.785 |
+| Random forest | Tuned | 0.652 | 0.843 | 0.679 | 0.497 | 0.574 | 0.804 |
+
+The nominated forest achieved the highest test average precision. Logistic regression achieved higher F1 and recall at the fixed threshold, which shows the trade-off between ranking quality and a particular contact rule. Its baseline and tuned results are identical because the search retained its baseline setting. The development AP difference between the forest and logistic regression was only 0.004, so this experiment supports a cautious comparison.
+
+![Test ROC curves, precision-recall curves and nominated-model confusion matrix](results/test-evaluation.png)
+
+## Method references
+
+scikit-learn developers (n.d.) *GridSearchCV*. Available at: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html (Accessed: 23 November 2026).

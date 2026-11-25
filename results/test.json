@@ -1,0 +1,103 @@
+{
+  "data_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "tuning_sha256": "434b56e1cd5c6c3e926c7899f5bb2c532b18f937e999a2021c4d41413bd78069",
+  "python_version": "3.13.12",
+  "packages": {
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1"
+  },
+  "seed": 42,
+  "threshold": 0.5,
+  "development_rows": 5634,
+  "test_rows": 1409,
+  "test_churned": 374,
+  "nominated_before_test": "Random forest tuned",
+  "models": {
+    "Dummy baseline": {
+      "average_precision": 0.2654364797728886,
+      "roc_auc": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.7345635202271115,
+      "tn": 1035,
+      "fp": 0,
+      "fn": 374,
+      "tp": 0
+    },
+    "KNN baseline": {
+      "average_precision": 0.5057238285423418,
+      "roc_auc": 0.7778604458911365,
+      "precision": 0.5420289855072464,
+      "recall": 0.5,
+      "f1": 0.5201668984700973,
+      "accuracy": 0.7551454932576295,
+      "tn": 877,
+      "fp": 158,
+      "fn": 187,
+      "tp": 187
+    },
+    "KNN tuned": {
+      "average_precision": 0.6062865051273,
+      "roc_auc": 0.8286225425611615,
+      "precision": 0.5926966292134831,
+      "recall": 0.5641711229946524,
+      "f1": 0.5780821917808219,
+      "accuracy": 0.7814052519517388,
+      "tn": 890,
+      "fp": 145,
+      "fn": 163,
+      "tp": 211
+    },
+    "Logistic regression baseline": {
+      "average_precision": 0.6315400974230942,
+      "roc_auc": 0.8408483815133431,
+      "precision": 0.6498422712933754,
+      "recall": 0.5508021390374331,
+      "f1": 0.5962373371924746,
+      "accuracy": 0.8019872249822569,
+      "tn": 924,
+      "fp": 111,
+      "fn": 168,
+      "tp": 206
+    },
+    "Logistic regression tuned": {
+      "average_precision": 0.6315400974230942,
+      "roc_auc": 0.8408483815133431,
+      "precision": 0.6498422712933754,
+      "recall": 0.5508021390374331,
+      "f1": 0.5962373371924746,
+      "accuracy": 0.8019872249822569,
+      "tn": 924,
+      "fp": 111,
+      "fn": 168,
+      "tp": 206
+    },
+    "Random forest baseline": {
+      "average_precision": 0.6087705163480011,
+      "roc_auc": 0.8176483505128005,
+      "precision": 0.6141479099678456,
+      "recall": 0.5106951871657754,
+      "f1": 0.5576642335766423,
+      "accuracy": 0.7849538679914834,
+      "tn": 915,
+      "fp": 120,
+      "fn": 183,
+      "tp": 191
+    },
+    "Random forest tuned": {
+      "average_precision": 0.6515963863417876,
+      "roc_auc": 0.842980960500142,
+      "precision": 0.6788321167883211,
+      "recall": 0.49732620320855614,
+      "f1": 0.5740740740740741,
+      "accuracy": 0.8041163946061036,
+      "tn": 947,
+      "fp": 88,
+      "fn": 188,
+      "tp": 186
+    }
+  }
+}
