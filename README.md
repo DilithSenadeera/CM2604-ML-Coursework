@@ -30,6 +30,7 @@ Download version 1 of BlastChar's Telco Customer Churn dataset and extract `WA_F
 .\.venv\Scripts\python.exe src/baseline.py
 .\.venv\Scripts\python.exe src/tune.py
 .\.venv\Scripts\python.exe src/evaluate.py
+.\.venv\Scripts\python.exe src/audit.py
 ```
 
 The exploratory analysis writes `results/training-eda.png`. The baseline comparison writes `results/baseline.json`, including settings, fold scores and software versions. Both scripts resolve paths from their source location.
@@ -61,6 +62,48 @@ The nominated forest achieved the highest test average precision. Logistic regre
 
 ![Test ROC curves, precision-recall curves and nominated-model confusion matrix](results/test-evaluation.png)
 
+## Ethics and subgroup errors
+
+The development process excludes customer identifiers from fitting, keeps source data and customer-level predictions outside Git, and publishes aggregate results. Gender and senior-citizen status are retained for auditing and excluded from predictors. Other attributes may act as proxies, so this exclusion alone cannot demonstrate fairness. Reproducible experiments, an independent test sample and reporting of missed churners support honest performance claims. The BCS Code of Conduct connects this work to privacy, non-discrimination and professional integrity (BCS, n.d.).
+
+Run `src/audit.py` after evaluation to produce `results/subgroups.json`. It uses the saved test predictions for the nominated random forest at the original 0.50 threshold. Recall divides correctly identified churners by actual churners. The false-positive rate divides incorrectly flagged customers by actual customers who stayed.
+
+| Group | Customers | Recall, identified / churned | False-positive rate, flagged / stayed |
+|---|---:|---:|---:|
+| Female | 687 | 49.2% (95/193) | 7.5% (37/494) |
+| Male | 722 | 50.3% (91/181) | 9.4% (51/541) |
+| SeniorCitizen = 0 | 1,187 | 48.6% (134/276) | 7.1% (65/911) |
+| SeniorCitizen = 1 | 222 | 53.1% (52/98) | 18.5% (23/124) |
+
+The senior group's false-positive rate is 11.4 percentage points higher. The estimate is based on 124 customers who stayed, so sampling variation and group composition need investigation. These observations do not establish the cause of the difference or certify fairness. The audit covers the recorded binary demographic categories separately. A wider population and combinations of characteristics require further evidence.
+
+For a real retention service, missed churners could lose access to helpful offers, while false positives could receive unwanted contact. Human review, understandable explanations and a way to correct data or decline contact should accompany any pilot. Use the ICO's privacy principles as a design reference, and determine the applicable jurisdiction, lawful basis, source permissions and customer rights before processing real customer data (ICO, n.d.).
+
+## Proposed post-deployment checks
+
+The following is a proposed operational plan. It adapts the NIST framework's governance, measurement and risk-management functions to this scenario (NIST, n.d.).
+
+| Check | Proposed owner and cadence | Response |
+|---|---|---|
+| Input validity, missing values, unseen categories and changing customer mix | Data owner, weekly | Investigate pipeline failures or material shifts and pause affected predictions when inputs are unreliable. |
+| AP, precision, recall, F1 and confusion counts, overall and by group | Model owner, monthly once churn outcomes are available | Compare with validated pilot ranges, review recurring group gaps and escalate deteriorating performance. Set alert limits during the pilot. |
+| Complaints, unwanted contact and unequal access to offers | Customer-service lead, ongoing | Review individual cases, correct errors and adjust the outreach process. |
+| Access permissions, retention and model changes | Privacy lead and model owner, periodically and before each release | Restrict access, apply the agreed retention policy, validate replacements on fresh data and retain an approved rollback option. |
+
+## Limitations and future improvements
+
+- The single historical dataset and random split provide a retrospective benchmark. Validate feature availability before prediction and use a later, representative customer cohort before operational use.
+- The fixed 0.50 threshold misses 188 of 374 churners for the nominated model. Assess contact costs, capacity and customer impact in a fresh validation study before choosing an operational threshold.
+- The 11 zero-tenure charge replacements are assumptions. Verify billing semantics with the data owner and test sensitivity to alternative treatments on development data.
+- The small development AP difference between forest and logistic regression and the partial subgroup audit limit a strong model preference. Use additional customer samples to assess performance stability and error differences.
+- Churn prediction alone does not show that contacting a customer prevents cancellation. A controlled retention pilot should measure whether the intervention helps customers and improves retention.
+
 ## Method references
+
+BCS (n.d.) *BCS Code of Conduct*. Available at: https://www.bcs.org/membership-and-registrations/become-a-member/bcs-code-of-conduct/ (Accessed: 25 November 2026).
+
+Information Commissioner's Office (ICO) (n.d.) *A guide to the data protection principles*. Available at: https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/ (Accessed: 25 November 2026).
+
+National Institute of Standards and Technology (NIST) (n.d.) *NIST AI RMF Playbook*. Available at: https://airc.nist.gov/airmf-resources/playbook/ (Accessed: 25 November 2026).
 
 scikit-learn developers (n.d.) *GridSearchCV*. Available at: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html (Accessed: 23 November 2026).
