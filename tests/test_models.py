@@ -13,9 +13,22 @@ from churn_data import CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 from models import baseline_models, score_probabilities
 from sklearn.model_selection import ParameterGrid
 from tune import PARAMETER_GRIDS
+from audit import group_errors
 
 
 class BaselineChecks(unittest.TestCase):
+    def test_subgroup_rates_and_undefined_denominators(self):
+        counts = group_errors([0, 0, 1, 1], [0, 1, 0, 1], ["A"] * 4)["A"]
+        self.assertEqual(counts["customers"], 4)
+        self.assertEqual(counts["recall"], 0.5)
+        self.assertEqual(counts["false_positive_rate"], 0.5)
+        for key in ["tn", "fp", "fn", "tp"]:
+            self.assertEqual(counts[key], 1)
+
+        groups = group_errors([0, 0, 1, 1], [0, 1, 0, 1], ["A", "A", "B", "B"])
+        self.assertIsNone(groups["A"]["recall"])
+        self.assertIsNone(groups["B"]["false_positive_rate"])
+
     def test_search_grids_include_baseline_first(self):
         expected_sizes = {"KNN": 16, "Logistic regression": 5, "Random forest": 18}
         for name, grid in PARAMETER_GRIDS.items():

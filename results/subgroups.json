@@ -1,0 +1,55 @@
+{
+  "model": "Random forest tuned",
+  "threshold": 0.5,
+  "test_report_sha256": "3c9512497e5292b66866ca73bae41a8538c04fcfa6600b4a89086c5f34e4e97a",
+  "groups": {
+    "gender": {
+      "Female": {
+        "customers": 687,
+        "churned": 193,
+        "stayed": 494,
+        "tn": 457,
+        "fp": 37,
+        "fn": 98,
+        "tp": 95,
+        "recall": 0.49222797927461137,
+        "false_positive_rate": 0.07489878542510121
+      },
+      "Male": {
+        "customers": 722,
+        "churned": 181,
+        "stayed": 541,
+        "tn": 490,
+        "fp": 51,
+        "fn": 90,
+        "tp": 91,
+        "recall": 0.5027624309392266,
+        "false_positive_rate": 0.09426987060998152
+      }
+    },
+    "SeniorCitizen": {
+      "0": {
+        "customers": 1187,
+        "churned": 276,
+        "stayed": 911,
+        "tn": 846,
+        "fp": 65,
+        "fn": 142,
+        "tp": 134,
+        "recall": 0.4855072463768116,
+        "false_positive_rate": 0.07135016465422613
+      },
+      "1": {
+        "customers": 222,
+        "churned": 98,
+        "stayed": 124,
+        "tn": 101,
+        "fp": 23,
+        "fn": 46,
+        "tp": 52,
+        "recall": 0.5306122448979592,
+        "false_positive_rate": 0.18548387096774194
+      }
+    }
+  }
+}
